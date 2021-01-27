@@ -1,19 +1,15 @@
 package com.uoc.tfm.service;
 
-import com.uoc.tfm.domain.cdmx.Token;
 import com.uoc.tfm.domain.location.StationLocationMain;
 import com.uoc.tfm.domain.status.StationStatusMain;
 import com.uoc.tfm.commons.domain.StationsLocation;
 import com.uoc.tfm.commons.domain.StationsStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 
-import static com.uoc.tfm.domain.cdmx.UrlManager.locationUrl;
-import static com.uoc.tfm.domain.cdmx.UrlManager.stationUrl;
 import static java.time.LocalDateTime.now;
 
 @Service
@@ -22,48 +18,28 @@ public class ClientServiceImpl implements ClientService {
     @Value("${service.name:default}")
     private String serviceName;
 
-    @Autowired
-    private TokenService tokenService;
-
-    private static Token token;
+    private static String URL = "https://layer.bicyclesharing.net/map/v1/nyc/map-inventory";
 
     @Override
     public StationsLocation getStationsLocation() {
-        generateToken();
         RestTemplate restTemplate = new RestTemplate();
-        StationLocationMain stationLocation =
-                restTemplate.getForObject(
-                        locationUrl(Token.getInstance().getAccess_token()),
-                        StationLocationMain.class);
-        return mapStationsLocation(stationLocation);
+        return mapStationsLocation(restTemplate.getForObject(URL, StationLocationMain.class));
     }
 
     @Override
     public StationsStatus getStationStatus() {
-        generateToken();
         RestTemplate restTemplate = new RestTemplate();
-        StationStatusMain stationStatusMain =
-                restTemplate.getForObject(
-                        stationUrl(Token.getInstance().getAccess_token()),
-                        StationStatusMain.class);
-        return mapStationsStatus(stationStatusMain);
-    }
-
-    private void generateToken() {
-        if(!tokenService.isTokenActive()) {
-            tokenService.generateNewToken();
-        }
+        return mapStationsStatus(restTemplate.getForObject(URL, StationStatusMain.class));
     }
 
     private StationsStatus mapStationsStatus(StationStatusMain stationStatus) {
         StationsStatus stationsStatus = new StationsStatus(now());
 
-        stationStatus.getStationsStatus().forEach(x -> {
-            int size = x.getAvailability().getBikes() + x.getAvailability().getSlots();
+        stationStatus.getFeatures().forEach(x -> {
             stationsStatus.addStation(
-                    x.getId(),
-                    size,
-                    x.getAvailability().getBikes());
+                    x.getProperties().getStation().getId(),
+                    x.getProperties().getStation().getCapacity(),
+                    x.getProperties().getStation().getBikes_available());
         });
 
         return stationsStatus;
@@ -72,12 +48,12 @@ public class ClientServiceImpl implements ClientService {
     private StationsLocation mapStationsLocation(StationLocationMain stationLocation) {
         StationsLocation stationsLocation = new StationsLocation(LocalDate.now());
 
-        stationLocation.getStations().forEach(x -> {
+        stationLocation.getFeatures().forEach(x -> {
             stationsLocation.addStation(
-                    x.getId(),
-                    x.getLocation().getLat(),
-                    x.getLocation().getLon(),
-                    x.getAddress());
+                    x.getProperties().getStation().getId(),
+                    x.getGeometry().getCoordinates()[1],
+                    x.getGeometry().getCoordinates()[0],
+                    x.getProperties().getStation().getName());
         });
 
         return stationsLocation;

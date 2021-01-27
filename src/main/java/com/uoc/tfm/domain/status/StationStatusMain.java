@@ -7,18 +7,18 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StationStatusMain {
 
-    private List<StationStatus> stationsStatus;
+    private List<StationStatus> features;
 
     public StationStatusMain(){
 
     }
 
-    public List<StationStatus> getStationsStatus() {
-        return stationsStatus;
+    public List<StationStatus> getFeatures() {
+        return features;
     }
 
-    public void setStationsStatus(List<StationStatus> stationsStatus) {
-        this.stationsStatus = stationsStatus;
+    public void setFeatures(List<StationStatus> features) {
+        this.features = features;
     }
 
 }

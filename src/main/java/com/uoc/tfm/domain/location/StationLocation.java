@@ -2,26 +2,17 @@ package com.uoc.tfm.domain.location;
 
 public class StationLocation {
 
-    private double lat;
-    private double lon;
+    private double[] coordinates;
 
     public StationLocation() {
 
     }
 
-    public double getLat() {
-        return lat;
+    public double[] getCoordinates() {
+        return coordinates;
     }
 
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-
-    public double getLon() {
-        return lon;
-    }
-
-    public void setLon(double lon) {
-        this.lon = lon;
+    public void setCoordinates(double[] coordinates) {
+        this.coordinates = coordinates;
     }
 }

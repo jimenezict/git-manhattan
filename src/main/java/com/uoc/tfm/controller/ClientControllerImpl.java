@@ -3,7 +3,6 @@ package com.uoc.tfm.controller;
 import com.uoc.tfm.service.ClientService;
 import com.uoc.tfm.commons.domain.StationsLocation;
 import com.uoc.tfm.commons.domain.StationsStatus;
-import com.uoc.tfm.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,6 @@ public class ClientControllerImpl implements ClientController {
 
     @Autowired
     private ClientService clientService;
-
-    @Autowired
-    private TokenService service;
 
     @Override
     public StationsLocation getStationsLocation() {

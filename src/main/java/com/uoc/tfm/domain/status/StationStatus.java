@@ -2,26 +2,18 @@ package com.uoc.tfm.domain.status;
 
 public class StationStatus {
 
-    private int id;
-    private Availability availability;
+    private StationStatusProperties properties;
 
     public StationStatus(){
 
     }
 
-    public int getId() {
-        return id;
+    public StationStatusProperties getProperties() {
+        return properties;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setProperties(StationStatusProperties properties) {
+        this.properties = properties;
     }
 
-    public Availability getAvailability() {
-        return availability;
-    }
-
-    public void setAvailability(Availability availability) {
-        this.availability = availability;
-    }
 }

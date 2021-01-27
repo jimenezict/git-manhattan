@@ -2,35 +2,27 @@ package com.uoc.tfm.domain.location;
 
 public class StationMain {
 
-    private int id;
-    private String address;
-    private StationLocation location;
+    private StationLocation geometry;
+
+    private StationLocationProperties properties;
 
     public StationMain() {
 
     }
 
-    public int getId() {
-        return id;
+    public StationLocation getGeometry() {
+        return geometry;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setGeometry(StationLocation geometry) {
+        this.geometry = geometry;
     }
 
-    public String getAddress() {
-        return address;
+    public StationLocationProperties getProperties() {
+        return properties;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public StationLocation getLocation() {
-        return location;
-    }
-
-    public void setLocation(StationLocation location) {
-        this.location = location;
+    public void setProperties(StationLocationProperties properties) {
+        this.properties = properties;
     }
 }
