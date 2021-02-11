@@ -5,9 +5,9 @@ import com.uoc.tfm.commons.domain.StationsStatus;
 
 public interface ClientService {
 
-    public StationsLocation getStationsLocation();
+    public StationsLocation getStationsLocation(String city);
 
-    public StationsStatus getStationStatus();
+    public StationsStatus getStationStatus(String city);
 
     public String getServiceName();
 

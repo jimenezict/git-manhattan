@@ -1,9 +1,9 @@
 package com.uoc.tfm.service;
 
-import com.uoc.tfm.domain.location.StationLocationMain;
-import com.uoc.tfm.domain.status.StationStatusMain;
 import com.uoc.tfm.commons.domain.StationsLocation;
 import com.uoc.tfm.commons.domain.StationsStatus;
+import com.uoc.tfm.domain.location.StationLocationMain;
+import com.uoc.tfm.domain.status.StationStatusMain;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 
 import static java.time.LocalDateTime.now;
+import static java.util.Objects.nonNull;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -18,45 +19,56 @@ public class ClientServiceImpl implements ClientService {
     @Value("${service.name:default}")
     private String serviceName;
 
-    private static String URL = "https://layer.bicyclesharing.net/map/v1/nyc/map-inventory";
+    private static String URL = "https://layer.bicyclesharing.net/map/v1/{city}/map-inventory";
 
     @Override
-    public StationsLocation getStationsLocation() {
+    public StationsLocation getStationsLocation(String city) {
         RestTemplate restTemplate = new RestTemplate();
-        return mapStationsLocation(restTemplate.getForObject(URL, StationLocationMain.class));
+        return mapStationsLocation(restTemplate.getForObject(generateURL(city), StationLocationMain.class));
     }
 
     @Override
-    public StationsStatus getStationStatus() {
+    public StationsStatus getStationStatus(String city) {
         RestTemplate restTemplate = new RestTemplate();
-        return mapStationsStatus(restTemplate.getForObject(URL, StationStatusMain.class));
+        return mapStationsStatus(restTemplate.getForObject(generateURL(city), StationStatusMain.class));
     }
 
-    private StationsStatus mapStationsStatus(StationStatusMain stationStatus) {
+    private static StationsStatus mapStationsStatus(StationStatusMain stationStatus) {
         StationsStatus stationsStatus = new StationsStatus(now());
 
         stationStatus.getFeatures().forEach(x -> {
-            stationsStatus.addStation(
-                    x.getProperties().getStation().getId(),
-                    x.getProperties().getStation().getCapacity(),
-                    x.getProperties().getStation().getBikes_available());
+            if (nonNull(x.getProperties()) && nonNull(x.getProperties().getStation())) {
+                stationsStatus.addStation(
+                        x.getProperties().getStation().getId(),
+                        x.getProperties().getStation().getCapacity(),
+                        x.getProperties().getStation().getBikes_available());
+            }
         });
 
         return stationsStatus;
     }
 
-    private StationsLocation mapStationsLocation(StationLocationMain stationLocation) {
+    private static StationsLocation mapStationsLocation(StationLocationMain stationLocation) {
         StationsLocation stationsLocation = new StationsLocation(LocalDate.now());
 
         stationLocation.getFeatures().forEach(x -> {
-            stationsLocation.addStation(
-                    x.getProperties().getStation().getId(),
-                    x.getGeometry().getCoordinates()[1],
-                    x.getGeometry().getCoordinates()[0],
-                    x.getProperties().getStation().getName());
+            try {
+                if (nonNull(x.getProperties()) && nonNull(x.getGeometry())) {
+                    stationsLocation.addStation(
+                            x.getProperties().getStation().getId(),
+                            x.getGeometry().getCoordinates()[1],
+                            x.getGeometry().getCoordinates()[0],
+                            x.getProperties().getStation().getName());
+                }
+            } catch (Exception ex) {
+            }
         });
 
         return stationsLocation;
+    }
+
+    private static String generateURL(String url) {
+        return URL.replace("{city}", url);
     }
 
     @Override

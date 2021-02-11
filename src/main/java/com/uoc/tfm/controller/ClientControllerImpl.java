@@ -19,38 +19,49 @@ public class ClientControllerImpl implements ClientController {
 
     @Override
     public StationsLocation getStationsLocation() {
-        log.info("Starting station collections: {}", clientService.getServiceName());
-        StationsLocation stationsLocation = new StationsLocation();
-
-        try {
-            stationsLocation = clientService.getStationsLocation();
-        } catch (Exception e) {
-            log.error("Fail on Location status collection {} due to: ", clientService.getServiceName(), e);
-            return stationsLocation;
-        }
-        log.info("Ending station collections: {} with {} registers",
-                clientService.getServiceName(),
-                stationsLocation.getStationLocationList().size());
-        return stationsLocation;
-
+        return getStationsLocation("nyc");
     }
 
     @Override
-    @GetMapping("/status")
     public StationsStatus getStationStatus() {
-        log.info("Starting station status collections: {}", clientService.getServiceName());
+        return getStationStatus("nyc");
+    }
+
+    @Override
+    public StationsLocation getStationsLocation(String city) {
+        log.info("Starting station collections: {} and city {}", clientService.getServiceName(), city);
+        StationsLocation stationsLocation = new StationsLocation();
+
+        try {
+            stationsLocation = clientService.getStationsLocation(city);
+        } catch (Exception e) {
+            log.error("Fail on Location status collection {} for city {} due to: ",
+                    clientService.getServiceName(), city, e);
+            return stationsLocation;
+        }
+        log.info("Ending station collections: {} for city {} with {} registers",
+                clientService.getServiceName(),
+                city,
+                stationsLocation.getStationLocationList().size());
+        return stationsLocation;
+    }
+
+    @Override
+    public StationsStatus getStationStatus(String city) {
+        log.info("Starting station status collections: {} and city {}", clientService.getServiceName(), city);
         StationsStatus stationStatus = new StationsStatus();
 
         try {
-            stationStatus = clientService.getStationStatus();
+            stationStatus = clientService.getStationStatus(city);
         } catch (Exception e) {
-            log.error("Fail on station status collection {} due to: ", clientService.getServiceName(), e);
+            log.error("Fail on station status collection {} for city {} due to: ",
+                    clientService.getServiceName(), city, e);
             return stationStatus;
         }
-        log.info("Ending station status collections: {} with {} registers",
+        log.info("Ending station status collections: {} for city {} with {} registers",
                 clientService.getServiceName(),
+                city,
                 stationStatus.getStationStatusList().size());
         return stationStatus;
-
     }
 }
